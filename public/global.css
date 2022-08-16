@@ -61,3 +61,50 @@ button:not(:disabled):active {
 button:focus {
 	border-color: #666;
 }
+
+
+form{
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	padding: 20px;
+	text-align: center;
+	margin: 10px auto;
+}
+form .form-field{
+	box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+	border-radius: 3px;
+	margin-bottom: 10px;
+}
+form button{
+	background: #272727;
+	color: #fff;
+	cursor: pointer;
+	padding: 10px 0;
+	margin-top: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+}
+
+a{
+	text-decoration: none;
+	color: #272727;
+}
+
+.link{
+	cursor: pointer;
+}
+
+.error{
+	color: orangered;
+}
+
+.success{
+	color: green;
+}
+
+button:disabled{
+	opacity: 0.5;
+	cursor: not-allowed;
+}

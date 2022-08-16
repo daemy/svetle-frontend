@@ -1,33 +1,55 @@
 <script>
-	export let name;
-	export let number;
 
-	$: upperCaseName = name.toUpperCase();
+	/** IMPORTS */
+	import { Router, Route } from "svelte-navigator";
+	import Login from './Login.svelte';
+	import Signup from './Signup.svelte';
+	import Home from './Home.svelte';
+	import PrivateRoute from "./routes/PrivateRoutes.svelte";
 
-	$: console.log(name);
-
-	function incrementNumber() {
-		number += 1
+	/** VARIABLES */
+	var sdkoptions = {
+	"apiKey": __myapp["env"].API_CLIENT_KEY,
+	"appName":__myapp["env"].APP_NAME,
+    "apiSecret":__myapp["env"].API_SECRET
 	}
-
-	function decrementNumber() {
-		if (number>1) {
-			number -= 1
-		}
-	}
-
-	function changeName() {
-		name = "b";
-	}
+	
 </script>
 
+<main>
+	<Router>
+		<div>
+			<Route path="signup">
+				<Signup {sdkoptions} />
+			</Route>
+			<Route path="login">
+				<Login {sdkoptions} />
+			</Route>
+			<PrivateRoute path="/" let:location>
+				<Home />
+			 </PrivateRoute>
+		</div>
+	</Router>
+</main>
+
 <style>
+	main {
+		text-align: center;
+		padding: 1em;
+		max-width: 240px;
+		margin: 0 auto;
+	}
+
 	h1 {
-		color: purple;
+		color: #ff3e00;
+		text-transform: uppercase;
+		font-size: 4em;
+		font-weight: 100;
+	}
+
+	@media (min-width: 640px) {
+		main {
+			max-width: none;
+		}
 	}
 </style>
-
-<h1>{upperCaseName}, counter is {number}!</h1>
-<button on:click="{incrementNumber}">Increment</button>
-<button on:click="{decrementNumber}">Decrement</button>
-<button on:click="{changeName}">Change name</button>
