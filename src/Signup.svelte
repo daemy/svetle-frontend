@@ -7,7 +7,9 @@
     let password;
     let firstName;
     let lastName;
+    let username;
     let loading;
+    let role = ["user"];
 
     let signupResponse={
         success:null,
@@ -23,15 +25,12 @@
 
     const handleSubmit=()=>{
         const signupFields={
-            "FirstName": firstName,
-            "LastName": lastName,
-            "Email": [
-                {
-                "Type": "Primary",
-                "Value": email
-                }
-            ],
-            "Password": password
+            "firstName": firstName,
+            "lastName": lastName,
+            "username": username,
+            "email": email,
+            "password": password,
+            "role": role
     }
     loading=true;
     signupResponse={
@@ -41,7 +40,7 @@
         id:null,
         fullname:null
     }
-    const endpoint=`https://api.loginradius.com/identity/v2/manage/account?apikey=${sdkoptions.apiKey}&apisecret=${sdkoptions.apiSecret}`;
+    const endpoint=`http://localhost:8080/api/auth/signup`;
     fetch(endpoint,
     {
     method:'POST',
@@ -50,20 +49,24 @@
     },
     body:JSON.stringify(signupFields)
     }).then(response=>response.json())
-      .then(data=>{
-          if(data.ErrorCode){
-              if(data.ErrorCode==936){ 
-              signupResponse={
+        .then(data=>{
+            if(data.ErrorCode){
+                if(data.ErrorCode==936){ 
+                    signupResponse={
                     ...signupResponse,
                     error:data.Message
                 }
-             }
-            else if(data.ErrorCode==1134){
+            } else if(data.ErrorCode==1134){
                 signupResponse={
                     ...signupResponse,
                     error:data.Errors[0].ErrorMessage
                 }
-            }else{
+            } else if(data.ErrorCode==400){
+                signupResponse={
+                    ...signupResponse,
+                    error:data.Errors[0].ErrorMessage
+                }
+            } else{
                 signupResponse={
                     ...signupResponse,
                     error:data.Description
@@ -89,8 +92,9 @@
 <form on:submit|preventDefault={handleSubmit}>
     <input class="form-field" bind:value={firstName} type="text" placeholder="First Name" >
     <input class="form-field" bind:value={lastName} type="text" placeholder="Last Name" >
-    <input class="form-field" bind:value={email} type="email" placeholder="Email" >
-    <input class="form-field" bind:value={password} type="password" placeholder="Password" >
+    <input class="form-field" bind:value={username} type="text" placeholder="username" >
+    <input class="form-field" bind:value={email} type="email" placeholder="email" >
+    <input class="form-field" bind:value={password} type="password" placeholder="password" >
     <button disabled={loading} class="form-field">
         Signup
     </button>

@@ -4,7 +4,7 @@
     const navigate = useNavigate();
     import {user} from './stores';
 
-    let email;
+    let username;
     let password;
     let loading;
 
@@ -19,23 +19,23 @@
 
     const navigateToSignup=()=>navigate('/signup')
 
-    const handleSubmit=(e)=>{
-       let loginFields={email,password};
-       const endpoint=`https://api.loginradius.com/identity/v2/auth/login?apikey=${sdkoptions.apiKey}&apisecret=${sdkoptions.apiSecret}`;
+    const handleSubmit=()=>{
+       let loginFields={username,password};
+       const endpoint=`http://localhost:8080/api/auth/signin`;
        loading=true;
        loginResponse={
         error:null,
         success:null,
         profile:null,
         auth_token:null
-    }
-    fetch(endpoint,
+        }
+        fetch(endpoint,
         {
-        method:'POST',
-        headers: {
-        'Content-Type': 'application/json'
-        },
-        body:JSON.stringify(loginFields)
+            method:'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(loginFields)
         }).then(response=>response.json())
         .then(data=>{
             console.log(data)
@@ -51,7 +51,14 @@
                         ...loginResponse,
                         error:data.Errors[0].ErrorMessage
                     }
+                }
+                else if(data.ErrorCode==400){
+                    loginResponse={
+                        ...loginResponse,
+                        error:data.Message
+                    }
                 }else{
+
                     loginResponse={
                         ...loginResponse,
                         error:data.Description
@@ -61,10 +68,14 @@
                 loginResponse={
                     ...loginResponse,
                     success:true,
-                    profile:data.Profile,
+                    profile:{
+                        id:data.id,
+                        username:data.username,
+                        email:data.email,
+                        roles:data.roles,
+                    },
                     auth_token:{
-                        access_token:data.access_token,
-                        refresh_token:data.refresh_token,
+                        access_token:data.accessToken,
                         ttl:data.expires_in
                     }
                 }
@@ -81,7 +92,7 @@
 
 <h3>Login </h3>
 <form on:submit|preventDefault={handleSubmit}>
-    <input class="form-field" bind:value={email} type="email" placeholder="Email" >
+    <input class="form-field" bind:value={username} type="text" placeholder="username" >
     <input class="form-field" bind:value={password} type="password" placeholder="Password" >
     <button disabled={loading} class="form-field">
         Login 
