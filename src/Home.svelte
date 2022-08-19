@@ -4,7 +4,12 @@
     let _user;
     let tmpuser;
     let auth_token;
-    let checkAccess;    
+    let checkAccess;
+    let userId;
+    let todo;
+    let todoName;
+    let todoDesc;
+
     user.subscribe(data=>_user=data)
 
     const checkPublic=()=>{
@@ -71,7 +76,7 @@
             .then(data=>{
                 console.log(data)
                 if(data.ErrorCode){
-                    if(data.ErrorCode==401){
+                    if(data.ErrorCode==403){
                         checkAccess="Unauthorized"
                     } else {
                         checkAccess="Error occurred while making request"
@@ -81,6 +86,24 @@
                 }
             })
     }
+
+    function loadTodos() {
+        tmpuser=JSON.parse(window.localStorage.getItem('user'))
+        userId = (tmpuser["profile"])["id"]
+        const endpoint="http://localhost:8761/api/todo/"+userId
+        console.log(endpoint)
+        fetch(endpoint,
+            {
+                method:'GET'
+            }).then(data => {
+                return data.json();
+            })
+            .then(data2 => {
+                todo = data2;
+                console.log(todo)
+                checkAccess="todo"
+            });
+        }
 
 
 
@@ -97,8 +120,14 @@
     <button on:click={checkPublic}>Check public access</button>
     <button on:click={checkMod}>Check moderator access</button>
     <button on:click={checkAdmin}>Check admin access</button>
+    <button on:click={loadTodos}>Load Todos</button>
 
-    {#if checkAccess!=undefined}
+    {#if checkAccess!=undefined && checkAccess!="todo"}
         <p>{checkAccess}</p>
+    {:else if checkAccess=="todo"}
+        {#each todo as item}
+            <h3>{item["name"]}</h3>
+            <p>{item["description"]}</p>
+        {/each}
     {/if}
 {/if}
