@@ -1,4 +1,6 @@
 <script>
+import CustomButton from './CustomButton.svelte';
+
     import {user} from './stores';
 
     let _user;
@@ -7,8 +9,6 @@
     let checkAccess;
     let userId;
     let todo;
-    let todoName;
-    let todoDesc;
 
     user.subscribe(data=>_user=data)
 
@@ -105,7 +105,17 @@
             });
         }
 
+    function changeStatus(todo) {
+        if (todo.status=="Y") {
+            todo.status="N";
+        } else {
+            todo.status="Y";
+        }
+    }
 
+    function editTodo() {
+        console.log(todo);
+    }
 
     const logout=()=>{
         user.set(null);
@@ -114,20 +124,68 @@
    
 </script>
 
+<style>
+
+    #header {
+        position:sticky;
+        top:10px;
+        margin-bottom: 50px;
+        background-color:plum;
+    }
+
+    #todo-section {
+        display:table;
+    }
+
+    /* #todo-item {
+        display:table-cell;
+        border-radius: 10%;
+        border: 1px black solid;
+        width: 200px;
+    } */
+
+    .active-item {
+        background: greenyellow;
+    }
+
+    .ended-item {
+        background:indianred;
+    }
+
+</style>
+
 {#if user && _user}
-    <h3>Welcome {_user?.profile?.username}</h3>
-	<button on:click={logout}>Logout </button>
-    <button on:click={checkPublic}>Check public access</button>
-    <button on:click={checkMod}>Check moderator access</button>
-    <button on:click={checkAdmin}>Check admin access</button>
-    <button on:click={loadTodos}>Load Todos</button>
+    <div id="header">
+        <h3>Welcome {_user?.profile?.username}</h3>
+        <button on:click={logout}>Logout </button>
+        <button on:click={checkPublic}>Check public access</button>
+        <button on:click={checkMod}>Check moderator access</button>
+        <button on:click={checkAdmin}>Check admin access</button>
+        <button on:click={loadTodos}>Load Todos</button>
+    </div>
 
     {#if checkAccess!=undefined && checkAccess!="todo"}
         <p>{checkAccess}</p>
     {:else if checkAccess=="todo"}
-        {#each todo as item}
-            <h3>{item["name"]}</h3>
-            <p>{item["description"]}</p>
-        {/each}
+        <div id ="todo-section">
+            {#each todo as todoItem, i}
+                {#if todoItem.status=="Y"}
+                    <CustomButton item={todoItem}  on:click={editTodo}/>
+                    <!-- <div on:click={changeStatus(item)} id="todo-item" class="active-item">
+                        <h3>{item["name"]}</h3>
+                        <p>{item["description"]}</p>
+                        <p>{item["reminderDate"]}</p>
+                    </div> -->
+                {:else}
+                    <CustomButton item={todoItem} />
+
+                    <!-- <div id="todo-item" class="ended-item">
+                        <h3>{item["name"]}</h3>
+                        <p>{item["description"]}</p>
+                        <p>{item["reminderDate"]}</p>
+                    </div> -->
+                {/if}
+            {/each}
+        </div>
     {/if}
 {/if}
